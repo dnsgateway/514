@@ -76,6 +76,17 @@
     </div>
   </footer>
 
-  <script src="script.js"></script>
+  <script>
+    document.querySelector('.menu-toggle').addEventListener('click', () => {
+  document.getElementById('slideMenu').classList.toggle('active');
+});
+
+document.querySelectorAll('.bottom-nav i').forEach(icon => {
+  icon.addEventListener('click', e => {
+    document.querySelectorAll('.bottom-nav i').forEach(i => i.classList.remove('active'));
+    e.target.classList.add('active');
+  });
+});
+  </script>
 </body>
 </html>
