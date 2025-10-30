@@ -1,92 +1,588 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digit – Self Custody Crypto Wallet</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Digit — iPhone X Prototype (Flat)</title>
+
+<!-- Font Awesome -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+
+<style>
+  /* --------- Theme & Layout --------- */
+  :root{
+    --bg: #0b0b0f;
+    --card: #111217;
+    --muted: #9aa4b2;
+    --accent: #4a90e2;
+    --accent-2: #7b61ff;
+    --success: #2bd58a;
+    --danger: #ff8a65;
+    --glass: rgba(255,255,255,0.03);
+    --divider: rgba(255,255,255,0.06);
+    --white: #eef3f8;
+  }
+
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;}
+  body{
+    background: linear-gradient(180deg,#081018 0%, #0b0b0f 100%);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:36px;
+    color:var(--white);
+    padding:40px 20px;
+  }
+
+  header{width:100%;max-width:1100px;display:flex;justify-content:space-between;align-items:center;}
+  header h1{margin:0;color:var(--accent);font-size:22px;}
+  header a{color:var(--muted);text-decoration:none;font-weight:600;}
+
+  .page {
+    width:100%;
+    max-width:1100px;
+    display:flex;
+    gap:48px;
+    align-items:flex-start;
+    justify-content:center;
+  }
+
+  .left {
+    color:var(--white);
+    max-width:480px;
+  }
+
+  .left h2{
+    font-size:36px;
+    margin:0 0 12px;
+    color:var(--white);
+  }
+  .left p{color:var(--muted);line-height:1.6}
+  .left .cta{margin-top:20px;padding:12px 20px;border-radius:10px;background:linear-gradient(90deg,var(--accent),#2ea0ff);border:none;color:white;font-weight:700;cursor:pointer;box-shadow:0 8px 28px rgba(74,144,226,0.12)}
+  .left .note{margin-top:10px;color:var(--muted);font-size:13px}
+
+  /* --------- iPhone X Flat Mockup --------- */
+  /* base device width/height (iPhone X ratio) */
+  .device-wrap{display:flex;align-items:center;justify-content:center;}
+  .device {
+    --dw: 375; /* base width */
+    --dh: 812; /* base height */
+    width: calc(var(--dw) * 0.72px); /* scaled for desktop */
+    height: calc(var(--dh) * 0.72px);
+    background: #000;
+    border-radius: 44px;
+    padding: 12px;
+    box-sizing: border-box;
+    position:relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  /* responsive scaling: keep device visible on small screens */
+  @media (max-width:920px){
+    .device { transform: scale(0.88); transform-origin: center; }
+  }
+  @media (max-width:700px){
+    .page{flex-direction:column;align-items:center}
+    .device { width: calc(var(--dw) * 0.58px); height: calc(var(--dh) * 0.58px); }
+    .left{max-width:360px;text-align:center}
+  }
+  @media (max-width:420px){
+    .device { width: calc(var(--dw) * 0.44px); height: calc(var(--dh) * 0.44px); }
+  }
+
+  /* notch */
+  .notch{
+    position:absolute;top:6px;left:50%;transform:translateX(-50%);
+    width: 210px;height:30px;background:#000;border-bottom-left-radius:12px;border-bottom-right-radius:12px;z-index:30;
+  }
+
+  /* screen */
+  .screen {
+    width:100%;
+    height:100%;
+    border-radius:36px;
+    overflow:hidden;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.12));
+    display:flex;
+    flex-direction:column;
+    position:relative;
+  }
+
+  /* top bar inside screen */
+  .topbar{
+    height:56px;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:transparent;
+  }
+  .brand{display:flex;align-items:center;gap:10px}
+  .brand .logo{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:700;color:white}
+  .brand .title{font-weight:700;color:var(--white)}
+
+  /* menu toggle */
+  .menu-btn{
+    width:40px;height:40px;border-radius:10px;border:none;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;color:var(--white);cursor:pointer;backdrop-filter:blur(6px);transition:transform .25s ease;
+  }
+  .menu-btn.open{transform:rotate(90deg) scale(1.03)}
+
+  /* side drawer (inside device) */
+  .drawer{
+    position:absolute;left:-240px;top:0;width:230px;height:100%;background:linear-gradient(180deg,#0f1115,#0b0c0f);padding:80px 18px 20px;border-right:1px solid var(--divider);box-shadow:6px 0 40px rgba(0,0,0,0.6);transition:left .34s cubic-bezier(.22,.9,.35,1);z-index:45;
+  }
+  .drawer.active{left:0}
+  .drawer h4{margin:0 0 12px;color:var(--accent);font-size:15px}
+  .drawer .ditem{display:flex;align-items:center;gap:10px;padding:10px 0;color:var(--muted);cursor:pointer;border-radius:8px}
+  .drawer .ditem:hover{color:var(--white);background:rgba(255,255,255,0.02)}
+
+  /* content area inside screen */
+  .content{
+    flex:1;
+    position:relative;
+    padding:10px 16px 0 16px;
+    overflow:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  /* divider above nav */
+  .divider {
+    height:1px;background:var(--divider);width:100%;
+  }
+
+  /* bottom nav */
+  .bottom-nav{
+    height:72px;display:flex;align-items:center;justify-content:space-around;background:linear-gradient(0deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));
+    border-top:1px solid var(--divider);gap:6px;padding:0 8px;
+  }
+  .bottom-nav button{
+    background:none;border:none;color:var(--muted);font-size:20px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:8px;border-radius:10px;transition:all .18s;
+  }
+  .bottom-nav button.active{color:var(--accent);transform:scale(1.08);box-shadow:0 6px 20px rgba(74,144,226,0.08)}
+
+  /* ---------- VIEW STYLES ---------- */
+  .view{position:absolute;inset:56px 0 72px 0;padding:12px 14px;box-sizing:border-box;opacity:0;transform:translateX(10px);transition:all .36s ease}
+  .view.active{opacity:1;transform:none;z-index:20}
+
+  /* Wallet view layout */
+  .wallet-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+  .card{
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:12px;padding:12px;box-shadow:0 8px 20px rgba(0,0,0,0.6);
+    border:1px solid rgba(255,255,255,0.02);
+  }
+  .card h4{margin:0;color:var(--muted);font-size:12px}
+  .card .big{font-size:18px;font-weight:700;margin-top:8px;color:var(--white)}
+  .ticker{display:flex;gap:10px;align-items:center;overflow:hidden}
+  .dot{width:10px;height:10px;border-radius:50%}
+
+  .assets-list{margin-top:12px}
+  .asset-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,0.03);color:var(--muted)}
+
+  /* activity view */
+  .activity-list{display:flex;flex-direction:column;gap:10px}
+  .activity-item{background:var(--glass);padding:12px;border-radius:10px;display:flex;justify-content:space-between;align-items:center}
+  .activity-item .meta{color:var(--muted);font-size:13px}
+
+  /* messages */
+  .message{background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.03));padding:12px;border-radius:12px;margin-bottom:10px}
+  .message .from{font-weight:700;color:var(--white)}
+  .message .text{color:var(--muted);font-size:13px;margin-top:6px}
+
+  /* offers */
+  .offers-grid{display:grid;grid-template-columns:1fr;gap:10px}
+  .offer-card{background:linear-gradient(90deg,#112, #08121b);padding:12px;border-radius:12px;color:var(--white);display:flex;justify-content:space-between;align-items:center}
+  .offer-card small{color:var(--muted)}
+
+  /* settings */
+  .settings-grid{display:grid;gap:10px}
+  .setting-row{display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--glass);border-radius:10px}
+
+  /* transaction modal */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:200;opacity:0;pointer-events:none;transition:opacity .18s}
+  .modal-backdrop.show{opacity:1;pointer-events:auto}
+  .modal{
+    width:320px;max-width:92%;background:#0e1114;padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);
+    box-shadow:0 18px 60px rgba(0,0,0,0.7);text-align:left;
+  }
+  .modal h4{margin:0;color:var(--white)}
+  .modal p{color:var(--muted);margin:8px 0 14px}
+  .modal .actions{display:flex;gap:10px;justify-content:flex-end}
+
+  /* small helper */
+  .muted{color:var(--muted);font-size:13px}
+  .center{text-align:center}
+
+  /* animated price pulse */
+  .price-up{color:var(--success);animation:pricePulse 1.4s infinite}
+  .price-down{color:var(--danger);animation:pricePulse 1.4s infinite}
+  @keyframes pricePulse{0%{opacity:1}50%{opacity:.65}100%{opacity:1}}
+</style>
 </head>
 <body>
-  <header>
-    <div class="logo">Digit</div>
-    <nav>
-      <a href="#">How It Works</a>
-    </nav>
-  </header>
 
-  <main class="container">
-    <section class="text-section">
-      <h1>Digit – Your All-in-One Self-Custody Wallet</h1>
-      <p>Manage, spend, and grow your crypto with ease. Swap, trade, and connect to Web3 & DApps — all from one secure, intuitive interface.</p>
-      <button class="cta">Get Started</button>
-    </section>
+<header>
+  <h1>Digit</h1>
+  <a href="#how-it-works">How it Works</a>
+</header>
 
-    <section class="mockup">
-      <div class="iphone-frame">
-        <div class="iphone-notch"></div>
-        <div class="app-screen">
-          <div class="top-bar">
-            <div class="menu-toggle"><i class="fas fa-bars"></i></div>
-            <div class="screen-title">Wallet</div>
-            <div class="balance">$12,483.20</div>
+<div class="page">
+  <div class="left">
+    <h2>Digit — Self-Custody Wallet (iPhone X Prototype)</h2>
+    <p>Flat, realistic iPhone X mockup with responsive scaling, animated menu drawer, rich Wallet / Activity / Messages / Offers / Settings interfaces, and testable transaction flows (Spend / Swap / Send / Exchange).</p>
+    <button class="cta" id="openConnect">Connect Wallet</button>
+    <div class="note">All interactions are simulated client-side for prototype/demo purposes.</div>
+  </div>
+
+  <div class="device-wrap">
+    <div class="device" role="img" aria-label="iPhone X mockup">
+      <div class="notch" aria-hidden="true"></div>
+
+      <div class="screen" id="screen">
+        <!-- drawer -->
+        <div class="drawer" id="drawer">
+          <h4>Quick Links</h4>
+          <div class="ditem"><i class="fa-solid fa-medal"></i> <span>Rewards</span></div>
+          <div class="ditem"><i class="fa-solid fa-shield-halved"></i> <span>Security</span></div>
+          <div class="ditem"><i class="fa-solid fa-chart-line"></i> <span>Analytics</span></div>
+          <div class="ditem"><i class="fa-solid fa-address-card"></i> <span>Linked Accounts</span></div>
+        </div>
+
+        <!-- top bar -->
+        <div class="topbar">
+          <div class="brand">
+            <div class="logo">D</div>
+            <div class="title">Digit</div>
           </div>
-
-          <div class="main-content">
-            <div class="card">
-              <h3>BTC Wallet</h3>
-              <p>Balance: 0.245 BTC</p>
-              <button class="btn">Send</button>
-              <button class="btn">Receive</button>
-            </div>
-            <div class="card">
-              <h3>ETH Wallet</h3>
-              <p>Balance: 1.82 ETH</p>
-              <button class="btn">Swap</button>
-              <button class="btn">Stake</button>
-            </div>
-          </div>
-
-          <div class="bottom-nav">
-            <i class="fas fa-wallet active" title="Wallet"></i>
-            <i class="fas fa-exchange-alt" title="Exchange"></i>
-            <i class="fas fa-comments" title="Messages"></i>
-            <i class="fas fa-cog" title="Settings"></i>
-            <i class="fas fa-user" title="Profile"></i>
-          </div>
-
-          <div class="slide-menu" id="slideMenu">
-            <h4>Extra Features</h4>
-            <ul>
-              <li><i class="fas fa-gift"></i> Rewards</li>
-              <li><i class="fas fa-shield-alt"></i> Security</li>
-              <li><i class="fas fa-chart-line"></i> Analytics</li>
-            </ul>
+          <div style="display:flex;gap:10px;align-items:center">
+            <button class="menu-btn" id="menuBtn" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+            <div style="color:var(--muted);font-size:13px">🔒 Secure</div>
           </div>
         </div>
-      </div>
-    </section>
-  </main>
 
-  <footer>
-    <p>© 2025 Digit Wallet. Powered by WordPress.</p>
-    <div class="footer-links">
-      <a href="#">Privacy Policy</a> | 
-      <a href="#">Terms of Use</a>
+        <!-- dynamic content -->
+        <div class="content">
+
+          <!-- Wallet View -->
+          <section class="view active" id="view-wallet">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div class="muted">Total Balance</div>
+                <div style="font-weight:800;font-size:20px;margin-top:6px">$12,345.67</div>
+                <div class="muted" style="margin-top:4px">+3.45% today</div>
+              </div>
+              <div style="text-align:right">
+                <div class="muted" style="font-size:12px">Portfolio</div>
+                <div style="width:64px;height:32px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:700">D</div>
+              </div>
+            </div>
+
+            <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+              <button class="card" data-action="spend" style="display:inline-flex;align-items:center;gap:8px"><i class="fa-solid fa-credit-card"></i> Spend</button>
+              <button class="card" data-action="swap" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(90deg,var(--accent-2),#6f5af5)"><i class="fa-solid fa-arrows-rotate"></i> Swap</button>
+              <button class="card" data-action="send" style="display:inline-flex;align-items:center;gap:8px"><i class="fa-solid fa-paper-plane"></i> Send</button>
+              <button class="card" data-action="exchange" style="display:inline-flex;align-items:center;gap:8px"><i class="fa-solid fa-exchange-alt"></i> Exchange</button>
+            </div>
+
+            <div style="margin-top:12px;display:flex;gap:12px" class="wallet-grid">
+              <div class="card">
+                <h4>Top Movers</h4>
+                <div style="margin-top:10px" class="ticker">
+                  <div style="flex:1">
+                    <div style="display:flex;justify-content:space-between">
+                      <small>BTC</small><small class="price-up">+1.3%</small>
+                    </div>
+                    <div class="big">$68,200</div>
+                  </div>
+                  <div style="width:6px"></div>
+                </div>
+              </div>
+
+              <div class="card">
+                <h4>Quick Actions</h4>
+                <div style="margin-top:8px;color:var(--muted);font-size:13px">Tap any action to simulate a transaction.</div>
+              </div>
+            </div>
+
+            <div class="assets-list">
+              <div class="card" style="margin-top:12px">
+                <h4>My Assets</h4>
+                <div class="asset-row"><div>Bitcoin</div><div>0.25 BTC</div></div>
+                <div class="asset-row"><div>Ethereum</div><div>2.35 ETH</div></div>
+                <div class="asset-row"><div>USDC</div><div>1,200 USDC</div></div>
+              </div>
+            </div>
+
+            <div style="height:8px"></div>
+
+            <div class="card">
+              <h4>Recent Activity</h4>
+              <div style="margin-top:8px">
+                <div class="activity-item" style="margin-bottom:8px">
+                  <div><strong>Sent</strong><div class="muted">To John • 2h</div></div>
+                  <div class="muted">-$100</div>
+                </div>
+                <div class="activity-item">
+                  <div><strong>Swap</strong><div class="muted">ETH → USDC • 1d</div></div>
+                  <div class="muted">+$14</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Activity View -->
+          <section class="view" id="view-activity">
+            <h4 style="margin-top:0">Activity</h4>
+            <div class="activity-list" style="margin-top:10px">
+              <!-- animated items -->
+              <div class="activity-item"><div><strong>Buy</strong><div class="muted">BTC • Market</div></div><div class="muted">+$1,200</div></div>
+              <div class="activity-item"><div><strong>Sell</strong><div class="muted">ETH • Limit</div></div><div class="muted">-$300</div></div>
+              <div class="activity-item"><div><strong>Reward</strong><div class="muted">Staking reward</div></div><div class="muted">+0.012 BTC</div></div>
+            </div>
+
+            <div style="margin-top:12px">
+              <div class="card">
+                <h4>Weekly Summary</h4>
+                <div class="muted" style="margin-top:8px">Net change: <span class="price-up">+2.4%</span></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Messages View -->
+          <section class="view" id="view-messages">
+            <h4 style="margin-top:0">Messages</h4>
+            <div style="margin-top:10px">
+              <div class="message">
+                <div class="from">Digit Team</div>
+                <div class="text">Your wallet backup reminder — enable 2FA for added security.</div>
+              </div>
+              <div class="message">
+                <div class="from">Exchange</div>
+                <div class="text">New swap pair available: SOL/USDC</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Offers View -->
+          <section class="view" id="view-offers">
+            <h4 style="margin-top:0">Offers</h4>
+            <div style="margin-top:10px" class="offers-grid">
+              <div class="offer-card">
+                <div>
+                  <strong>3% cashback</strong>
+                  <div class="muted">On crypto debit card purchases</div>
+                </div>
+                <small>Apply</small>
+              </div>
+
+              <div class="offer-card">
+                <div>
+                  <strong>Zero-fee Swap</strong>
+                  <div class="muted">Limited time: Swap BTC → ETH fee-free</div>
+                </div>
+                <small>Claim</small>
+              </div>
+            </div>
+          </section>
+
+          <!-- Settings View -->
+          <section class="view" id="view-settings">
+            <h4 style="margin-top:0">Settings</h4>
+            <div style="margin-top:10px" class="settings-grid">
+              <div class="setting-row"><div>Dark Mode</div><div><input type="checkbox" id="uiDark"/></div></div>
+              <div class="setting-row"><div>Enable 2FA</div><div><button class="card" id="enable2fa" style="padding:8px 10px">Enable</button></div></div>
+              <div class="setting-row"><div>Backup Wallet</div><div><button class="card" id="backupBtn">Backup</button></div></div>
+            </div>
+          </section>
+
+        </div> <!-- content -->
+
+        <div class="divider" aria-hidden="true"></div>
+
+        <nav class="bottom-nav" role="navigation" aria-label="Device bottom navigation">
+          <button class="active" data-target="view-wallet" title="Wallet"><i class="fa-solid fa-wallet fa-lg"></i></button>
+          <button data-target="view-activity" title="Activity"><i class="fa-solid fa-list-check fa-lg"></i></button>
+          <button data-target="view-messages" title="Messages"><i class="fa-solid fa-comments fa-lg"></i></button>
+          <button data-target="view-offers" title="Offers"><i class="fa-solid fa-tags fa-lg"></i></button>
+          <button data-target="view-settings" title="Settings"><i class="fa-solid fa-gear fa-lg"></i></button>
+        </nav>
+
+      </div> <!-- screen -->
+    </div> <!-- device -->
+  </div> <!-- device-wrap -->
+
+</div> <!-- page -->
+
+<footer style="width:100%;max-width:1100px;text-align:center;color:var(--muted);margin-top:12px">
+  © 2025 Digit. Powered by WordPress.
+</footer>
+
+<!-- Connect / Transaction Modal -->
+<div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
+  <div class="modal" id="modalBox" role="dialog" aria-modal="true">
+    <h4 id="modalTitle">Confirm Transaction</h4>
+    <p id="modalBody" class="muted">Details will appear here.</p>
+    <div class="actions" style="margin-top:12px">
+      <button id="modalCancel" class="card" style="background:transparent;color:var(--muted)">Cancel</button>
+      <button id="modalConfirm" class="card" style="background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white">Confirm</button>
     </div>
-  </footer>
+  </div>
+</div>
 
-  <script>
-    document.querySelector('.menu-toggle').addEventListener('click', () => {
-  document.getElementById('slideMenu').classList.toggle('active');
-});
+<!-- Simple Connect modal -->
+<div class="modal-backdrop" id="connectBackdrop" aria-hidden="true">
+  <div class="modal">
+    <h4>Connect Wallet</h4>
+    <p class="muted">Choose a simulated connector</p>
+    <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
+      <button class="card" data-wallet="MetaMask">MetaMask</button>
+      <button class="card" data-wallet="WalletConnect">WalletConnect</button>
+    </div>
+  </div>
+</div>
 
-document.querySelectorAll('.bottom-nav i').forEach(icon => {
-  icon.addEventListener('click', e => {
-    document.querySelectorAll('.bottom-nav i').forEach(i => i.classList.remove('active'));
-    e.target.classList.add('active');
+<script>
+/* ---------- App Interactions ---------- */
+const navBtns = document.querySelectorAll('.bottom-nav button');
+const views = document.querySelectorAll('.view');
+const drawer = document.getElementById('drawer');
+const menuBtn = document.getElementById('menuBtn');
+const modalBackdrop = document.getElementById('modalBackdrop');
+const modalBox = document.getElementById('modalBox');
+const modalBody = document.getElementById('modalBody');
+const modalTitle = document.getElementById('modalTitle');
+const modalCancel = document.getElementById('modalCancel');
+const modalConfirm = document.getElementById('modalConfirm');
+const connectBackdrop = document.getElementById('connectBackdrop');
+
+let activeView = document.querySelector('.view.active');
+
+/** Navigation switching (bottom nav) */
+navBtns.forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    navBtns.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const target = btn.dataset.target;
+    showView(target);
   });
 });
-  </script>
+
+function showView(id){
+  const v = document.getElementById(id);
+  if(!v) return;
+  views.forEach(s=>s.classList.remove('active'));
+  v.classList.add('active');
+  activeView = v;
+  // close drawer when switching view
+  drawer.classList.remove('active');
+  menuBtn.classList.remove('open');
+}
+
+/** Menu drawer toggle */
+menuBtn.addEventListener('click', ()=>{
+  drawer.classList.toggle('active');
+  menuBtn.classList.toggle('open');
+});
+
+/** CTA connect button */
+document.getElementById('openConnect').addEventListener('click', ()=> {
+  connectBackdrop.classList.add('show');
+  connectBackdrop.style.pointerEvents = 'auto';
+});
+
+/** connect modal actions */
+connectBackdrop.querySelectorAll('[data-wallet]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const name = btn.dataset.wallet;
+    closeConnect();
+    // quick feedback toast via transaction modal
+    showModal('Connect', `Connecting to ${name}...`, false);
+    setTimeout(()=> {
+      showModal('Connected', `${name} connected successfully 🎉`, true);
+    },1400);
+  });
+});
+function closeConnect(){ connectBackdrop.classList.remove('show'); connectBackdrop.style.pointerEvents='none'; }
+
+/** Modal helpers */
+function showModal(title, body, autoClose=false){
+  modalTitle.textContent = title;
+  modalBody.textContent = body;
+  modalBackdrop.classList.add('show');
+  modalBackdrop.style.pointerEvents = 'auto';
+  // confirm btn binds (no-op)
+  modalConfirm.onclick = () => {
+    modalBackdrop.classList.remove('show');
+    modalBackdrop.style.pointerEvents = 'none';
+    // small success feedback
+    flashSuccess();
+  };
+  modalCancel.onclick = ()=> {
+    modalBackdrop.classList.remove('show');
+    modalBackdrop.style.pointerEvents = 'none';
+  };
+  if(autoClose){
+    setTimeout(()=>{ modalBackdrop.classList.remove('show'); modalBackdrop.style.pointerEvents = 'none'; flashSuccess(); }, 1200);
+  }
+}
+
+function flashSuccess(){
+  // tiny subtle animation on active card
+  const badge = activeView.querySelector('.card');
+  if(badge){
+    badge.animate([{transform:'scale(1)'},{transform:'scale(1.03)'},{transform:'scale(1)'}], {duration:420});
+  }
+}
+
+/** Wallet action buttons (Spend / Swap / Send / Exchange) */
+document.querySelectorAll('[data-action]').forEach(btn=>{
+  btn.addEventListener('click', (e)=>{
+    const action = btn.dataset.action;
+    // prepare modal content
+    const map = {
+      spend: {title:'Spend Crypto', body:'Spend $50 from your USD balance?'},
+      swap: {title:'Swap Tokens', body:'Swap 0.1 ETH → 150 USDC?'},
+      send: {title:'Send Payment', body:'Send 0.01 BTC to contact?'},
+      exchange: {title:'Exchange Pair', body:'Exchange BTC/ETH at market rate?'}
+    };
+    const info = map[action] || {title:'Action', body:'Proceed?'};
+    showModal(info.title, info.body);
+  });
+});
+
+/** Settings toggles */
+document.getElementById('uiDark')?.addEventListener('change', (e)=>{
+  document.body.classList.toggle('dark', e.target.checked);
+});
+
+/** Backup / 2FA Buttons simulate */
+document.getElementById('backupBtn')?.addEventListener('click', ()=>{
+  showModal('Backup', 'Your wallet backup completed. (Simulated)', true);
+});
+document.getElementById('enable2fa')?.addEventListener('click', ()=>{
+  showModal('2FA', 'Two-factor authentication enabled (simulated).', true);
+});
+
+/** Close connect modal when backdrop clicked */
+connectBackdrop.addEventListener('click', (e)=>{
+  if(e.target === connectBackdrop) closeConnect();
+});
+
+/** Close transaction modal if clicking backdrop */
+modalBackdrop.addEventListener('click', (e)=>{
+  if(e.target === modalBackdrop) { modalBackdrop.classList.remove('show'); modalBackdrop.style.pointerEvents='none'; }
+});
+
+/* Keyboard shortcuts for testing (optional)
+   W = wallet, A = activity, M = messages, O = offers, S = settings, D = drawer toggle
+*/
+document.addEventListener('keydown', (e)=>{
+  if(e.key.toLowerCase() === 'w') document.querySelector('[data-target="view-wallet"]').click();
+  if(e.key.toLowerCase() === 'a') document.querySelector('[data-target="view-activity"]').click();
+  if(e.key.toLowerCase() === 'm') document.querySelector('[data-target="view-messages"]').click();
+  if(e.key.toLowerCase() === 'o') document.querySelector('[data-target="view-offers"]').click();
+  if(e.key.toLowerCase() === 's') document.querySelector('[data-target="view-settings"]').click();
+  if(e.key.toLowerCase() === 'd') { menuBtn.click(); }
+});
+
+</script>
 </body>
 </html>
